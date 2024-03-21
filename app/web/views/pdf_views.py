@@ -26,9 +26,9 @@ def upload_file(file_id, file_path, file_name):
 
     pdf = Pdf.create(id=file_id, name=file_name, user_id=g.user.id)
     print(pdf.id)
-    task_result = process_document.delay(pdf.id)
+    process_document.delay(pdf.id)
 
-    return task_result # pdf.as_dict()
+    return pdf.as_dict()
 
 
 @bp.route("/<string:pdf_id>", methods=["GET"])
