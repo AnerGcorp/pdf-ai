@@ -19,6 +19,9 @@ class StreamingHandler(BaseCallbackHandler):
     
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> Any:
         queue.put(None)
+    
+    def on_llm_error(self, error: Exception | KeyboardInterrupt, **kwargs: Any) -> Any:
+        queue.put(None)
 
 chat = ChatOpenAI(
     streaming=True,
