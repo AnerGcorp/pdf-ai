@@ -7,6 +7,7 @@ from langchain.callbacks.base import BaseCallbackHandler
 from queue import Queue
 from threading import Thread
 from dotenv import load_dotenv
+from langchain.schema.output import LLMResult
 
 load_dotenv()
 
@@ -15,6 +16,9 @@ queue = Queue()
 class StreamingHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs: Any) -> Any:
         queue.put(token)
+    
+    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> Any:
+        queue.put(None)
 
 chat = ChatOpenAI(
     streaming=True,
@@ -34,7 +38,10 @@ class StreamingChain(LLMChain):
 
         while True:
             token = queue.get()
+            if token is None:
+                break
             yield token
+
 chain = StreamingChain(llm=chat, prompt=prompt)
 
 for output in chain.stream(input={'content': "Tell me a joke"}):
