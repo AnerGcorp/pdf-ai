@@ -11,31 +11,33 @@ from langchain.schema.output import LLMResult
 
 load_dotenv()
 
-queue = Queue()
-
 class StreamingHandler(BaseCallbackHandler):
+    def __init__(self, queue):
+        self.queue = queue
+
     def on_llm_new_token(self, token: str, **kwargs: Any) -> Any:
-        queue.put(token)
+        self.queue.put(token)
     
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> Any:
-        queue.put(None)
+        self.queue.put(None)
     
-    def on_llm_error(self, error: Exception | KeyboardInterrupt, **kwargs: Any) -> Any:
-        queue.put(None)
+    def on_llm_error(self, error, **kwargs: Any) -> Any:
+        self.queue.put(None)
 
-chat = ChatOpenAI(
-    streaming=True,
-    callbacks=[StreamingHandler()]
-)
+chat = ChatOpenAI(streaming=True)
 
 prompt = ChatPromptTemplate.from_messages([
     ("human", "{content}")
 ])
 
 class StreamingChain(LLMChain):
+
     def stream(self, input):
+        queue = Queue()
+        handler = StreamingHandler(queue)
+
         def task():
-            self(input)
+            self(input, callbacks=[handler])
 
         Thread(target=task).start()
 
