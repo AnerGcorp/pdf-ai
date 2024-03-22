@@ -41,6 +41,8 @@ def create_message(conversation):
             "pdf_id": pdf.id,
         },
     )
+    print("=" * 90)
+    print(chat_args)
 
     chat = build_chat(chat_args)
 
@@ -52,4 +54,6 @@ def create_message(conversation):
             stream_with_context(chat.stream(input)), mimetype="text/event-stream"
         )
     else:
+        print("=" * 90)
+        print(chat.run(input))
         return jsonify({"role": "assistant", "content": chat.run(input)})
