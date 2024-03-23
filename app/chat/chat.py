@@ -16,7 +16,7 @@ def build_chat(chat_args: ChatArgs):
         chain = build_chat(chat_args)
     """
     retriever = build_retriever(chat_args=chat_args)
-    llm = build_llm(char_args=chat_args)
+    llm = build_llm(chat_args=chat_args)
     memory = build_memory(chat_args=chat_args)
 
     return StreamingConversationalRetrievalChain.from_llm(
