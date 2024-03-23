@@ -4,7 +4,7 @@ from invoke import task
 @task
 def dev(ctx):
     ctx.run(
-        "flask --app app.web run --debug --port 8000",
+        "flask --app app.web run --debug --port 8000 --threaded True",
         pty=True,
         env={"APP_ENV": "development"},
     )
